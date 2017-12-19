@@ -1,0 +1,30 @@
+var http = require('http');
+var fs = require('fs');
+
+var contentFile = 'hello world';
+var contentStream = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugiat expedita eligendi unde pariatur animi quibusdam facere excepturi non, alias repellat ab autem dolores nesciunt incidunt odit deserunt velit fugit rerum!'
+
+fs.mkdirSync('file');
+fs.mkdirSync('stream');
+
+fs.writeFileSync('./file/file.txt', contentFile, 'utf8');
+fs.writeFileSync('./stream/stream.txt', contentStream, 'utf8');
+
+var http = http.createServer(function(req, res) {
+	
+	if (req.url == '/file') {
+		fs.readFile('file/file.txt', function(err, data) {
+			if (err) throw err;
+			res.write(data);
+			res.end();
+        });
+    } else if (req.url == '/stream') {
+        var stream = fs.createReadStream('stream/stream.txt');
+        stream.pipe(res);
+    } else {
+		res.write('Download the file')
+        res.end();
+    }
+}).listen(3000, function(){
+    console.log('On localhost:3000');
+});
